@@ -155,18 +155,60 @@ function renderExhibits() {
     message.textContent = `“${exhibit.message}”`;
 
     const bottom = document.createElement("div");
-    bottom.className = "card-bottom";
+bottom.className = "card-bottom";
 
-    const note = document.createElement("span");
-    note.textContent = "LEFT HERE BY SOMEONE, SOMEWHERE";
+const note = document.createElement("span");
+note.textContent = "LEFT HERE BY SOMEONE, SOMEWHERE";
 
-    const arrow = document.createElement("span");
-    arrow.className = "card-open";
-    arrow.textContent = "↗";
-    arrow.setAttribute("aria-hidden", "true");
+const actions = document.createElement("div");
+actions.className = "card-actions";
 
-    bottom.append(note, arrow);
-    card.append(top, message, bottom);
+const arrow = document.createElement("span");
+arrow.className = "card-open";
+arrow.textContent = "↗";
+arrow.setAttribute("aria-hidden", "true");
+
+actions.appendChild(arrow);
+
+if (exhibit.createdAt) {
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-exhibit";
+  deleteBtn.textContent = "Delete";
+  deleteBtn.type = "button";
+  deleteBtn.setAttribute("aria-label", "Delete this exhibit");
+
+  deleteBtn.addEventListener("click", event => {
+    event.stopPropagation();
+
+    if (!confirm("Delete this exhibit from your browser?")) return;
+
+    const saved = loadSubmissions();
+    const index = saved.findIndex(item =>
+      item.createdAt === exhibit.createdAt &&
+      item.message === exhibit.message &&
+      item.category === exhibit.category
+    );
+
+    if (index === -1) return;
+
+    saved.splice(index, 1);
+
+    try {
+      localStorage.setItem(
+        "unsentMuseumMessages",
+        JSON.stringify(saved)
+      );
+      renderExhibits();
+    } catch {
+      alert("Unable to delete this exhibit.");
+    }
+  });
+
+  actions.appendChild(deleteBtn);
+}
+
+bottom.append(note, actions);
+card.append(top, msg, bottom);
 
     function openCard() {
       openExhibit(exhibit, card);
