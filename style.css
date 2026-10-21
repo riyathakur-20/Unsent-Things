@@ -925,3 +925,32 @@ h2 em {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Delete exhibit button */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.delete-exhibit {
+  position: relative;
+  z-index: 2;
+  border: 1px solid #efd5df;
+  background: #fff5f7;
+  color: #8c5267;
+  padding: 6px 9px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.delete-exhibit:hover {
+  background: #f4dce5;
+  border-color: #d8a0b2;
+}
+
+.delete-exhibit:focus-visible {
+  outline: 2px solid #b98599;
+  outline-offset: 3px;
+}
