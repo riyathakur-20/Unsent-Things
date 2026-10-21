@@ -1,209 +1,911 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#100e10">
-  <meta name="description" content="A quiet digital museum for the things we never said.">
-  <title>The Museum of Unsent Things</title>
+:root {
+  --bg: #100e10;
+  --surface: #171417;
+  --card: #191619;
+  --text: #eee6e8;
+  --muted: #9a8c96;
+  --accent: #c29aaa;
+  --line: #332b33;
+  --serif: "Playfair Display", Georgia, serif;
+  --sans: "DM Sans", sans-serif;
+}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-</head>
-<body>
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
 
-  <div class="grain"></div>
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
 
-  <header class="navbar">
-    <a href="#home" class="logo">
-      <span class="logo-icon">M.</span>
-      <span>THE UNSENT ARCHIVE</span>
-    </a>
-    <nav>
-      <a href="#museum">The collection</a>
-      <a href="#leave-message">Leave a message</a>
-    </nav>
-    <span class="header-note">EST. IN SILENCE</span>
-  </header>
+::selection {
+  background: var(--accent);
+  color: #100e10;
+}
 
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-top">
-        <span class="eyebrow"><span class="live-dot"></span> A MUSEUM OF HUMAN FEELING</span>
-        <span class="hero-number">VOL. 001 — FOREVER UNFINISHED</span>
-      </div>
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-      <div class="hero-content">
-        <p class="hero-pretitle">Some words never find their way home.</p>
+button, input, select, textarea {
+  font: inherit;
+}
 
-        <h1>The Museum<br>of <em>Unsent</em> Things<span class="period">.</span></h1>
+button {
+  color: inherit;
+}
 
-        <p class="hero-description">
-          Letters never delivered. Apologies never spoken.
-          People we still think about.
-          A quiet place for everything we couldn't say.
-        </p>
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.13;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
+}
 
-        <div class="hero-actions">
-          <a href="#museum" class="button button-primary">
-            Enter the museum <span>↗</span>
-          </a>
-          <a href="#leave-message" class="text-link">Leave something behind ↓</a>
-        </div>
-      </div>
+.navbar {
+  height: 76px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 11;
+  background: rgba(16, 14, 16, 0.92);
+}
 
-      <div class="hero-bottom">
-        <span>FOR THE WORDS WE KEPT</span>
-        <span class="hero-quote">"Somewhere between feeling and saying."</span>
-        <span>SCROLL TO EXPLORE ↓</span>
-      </div>
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
 
-      <div class="hero-orbit orbit-one"></div>
-      <div class="hero-orbit orbit-two"></div>
-    </section>
+.logo-icon {
+  font: 30px var(--serif);
+  color: var(--accent);
+}
 
-    <section class="intro-strip">
-      <span>NO NAMES REQUIRED.</span>
-      <span class="strip-star">✳</span>
-      <span>NO EXPLANATIONS NEEDED.</span>
-      <span class="strip-star">✳</span>
-      <span>JUST HUMAN THINGS.</span>
-    </section>
+.navbar nav {
+  display: flex;
+  gap: 32px;
+}
 
-    <section class="museum section-padding" id="museum">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">01 / THE COLLECTION</span>
-          <h2>Exhibits of the <em>unsaid.</em></h2>
-          <p class="section-description">
-            Every feeling leaves something behind.
-            Here are a few things someone couldn't say.
-          </p>
-        </div>
+.navbar nav a,
+.header-note {
+  font-size: 11px;
+  color: var(--muted);
+  transition: color 0.25s;
+}
 
-        <button class="random-button" id="randomBtn">
-          <span>↻</span> Surprise me
-        </button>
-      </div>
+.navbar nav a:hover,
+.footer a:hover {
+  color: var(--accent);
+}
 
-      <div class="filter-list" id="filters">
-        <button class="filter active" data-category="All">All exhibits</button>
-        <button class="filter" data-category="Almost Said">Almost said</button>
-        <button class="filter" data-category="Unspoken Love">Unspoken love</button>
-        <button class="filter" data-category="Goodbyes">Goodbyes</button>
-        <button class="filter" data-category="Apologies">Apologies</button>
-        <button class="filter" data-category="What If">What if</button>
-      </div>
+.header-note {
+  letter-spacing: 1.5px;
+}
 
-      <div class="collection-meta">
-        <span id="collectionCount">12 OBJECTS IN THE COLLECTION</span>
-        <span>TAKE YOUR TIME. THERE IS NO RUSH.</span>
-      </div>
+.hero {
+  min-height: 680px;
+  height: calc(100svh - 76px);
+  max-height: 900px;
+  min-height: 640px;
+  padding: 35px 7% 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
 
-      <div class="exhibit-grid" id="exhibitGrid"></div>
+.hero-top,
+.hero-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  z-index: 2;
+}
 
-      <div class="empty-state" id="emptyState" hidden>
-        <p>Nothing here yet.</p>
-        <span>Maybe you'll be the first to leave something behind.</span>
-      </div>
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 600;
+}
 
-      <p class="collection-footnote">
-        All stories are presented without names. Take what resonates.
-        Leave what doesn't.
-      </p>
-    </section>
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-right: 8px;
+  box-shadow: 0 0 12px var(--accent);
+}
 
-    <section class="interlude">
-      <span class="interlude-mark">✳</span>
-      <p>Perhaps the hardest things to say are the ones that mattered the most.</p>
-      <span class="interlude-caption">A THOUGHT LEFT IN THE HALLWAY</span>
-    </section>
+.hero-number,
+.hero-bottom {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+}
 
-    <section class="leave-section section-padding" id="leave-message">
-      <div class="leave-copy">
-        <span class="eyebrow">02 / YOUR EXHIBIT</span>
-        <h2>Leave the words.<br><em>Keep your name.</em></h2>
-        <p>
-          You don't have to send it. You don't have to explain it.
-          Write the thing that has been sitting inside you for too long.
-          Let it exist somewhere other than your mind.
-        </p>
+.hero-content {
+  max-width: 850px;
+  margin: 35px auto 55px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  animation: rise 1s both;
+}
 
-        <div class="privacy-note">
-          <span class="privacy-icon">✳</span>
-          <div>
-            <strong>A little room for privacy</strong>
-            <p>This demo saves your submission only in this browser.
-              It is not published to a shared public collection.</p>
-          </div>
-        </div>
-      </div>
+.hero-pretitle {
+  font: italic 17px var(--serif);
+  color: var(--muted);
+  margin-bottom: 15px;
+}
 
-      <form class="message-form" id="messageForm">
-        <div class="form-top">
-          <span>NEW EXHIBIT</span>
-          <span>NO. <span id="newExhibitNumber">013</span></span>
-        </div>
+.hero h1 {
+  font: 400 clamp(55px, 8.5vw, 108px)/1.12 var(--serif);
+  letter-spacing: -4px;
+}
 
-        <label for="messageCategory">WHAT KIND OF UNSAID THING IS IT?</label>
-        <select id="messageCategory" required>
-          <option value="Almost Said">Something I almost said</option>
-          <option value="Unspoken Love">Someone I loved</option>
-          <option value="Goodbyes">A goodbye</option>
-          <option value="Apologies">An apology</option>
-          <option value="What If">A what if</option>
-        </select>
+.hero h1 em,
+h2 em {
+  font-weight: 400;
+  color: var(--accent);
+}
 
-        <label for="messageText">YOUR WORDS</label>
-        <textarea
-          id="messageText"
-          maxlength="500"
-          minlength="5"
-          placeholder="Dear someone, somewhere..."
-          required
-        ></textarea>
+.period {
+  color: var(--accent);
+}
 
-        <div class="form-meta">
-          <span>WRITE WITHOUT FEAR.</span>
-          <span id="charCount">0 / 500</span>
-        </div>
+.hero-description {
+  max-width: 390px;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 24px;
+  line-height: 2;
+}
 
-        <button class="button button-primary submit-button" type="submit">
-          Leave it here <span>↗</span>
-        </button>
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 32px;
+}
 
-        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
-      </form>
-    </section>
+.button {
+  min-height: 49px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  transition: transform 0.25s, background 0.25s, border-color 0.25s;
+}
 
-    <section class="closing">
-      <span class="closing-symbol">M.</span>
-      <h2>Not everything needs<br>to be <em>sent.</em></h2>
-      <p>Some things just need somewhere to exist.</p>
-      <a href="#home" class="back-top">RETURN TO THE BEGINNING ↑</a>
-    </section>
-  </main>
+.button:hover {
+  transform: translateY(-3px);
+}
 
-  <footer class="footer">
-    <a href="#home">THE UNSENT ARCHIVE © 2026</a>
-    <span>MADE FOR THE THINGS WE NEVER SAID.</span>
-    <a href="#museum">BACK TO THE COLLECTION ↑</a>
-  </footer>
+.button-primary {
+  background: var(--accent);
+  color: #1b1219;
+}
 
-  <dialog class="exhibit-dialog" id="exhibitDialog">
-    <button class="dialog-close" id="dialogClose" aria-label="Close">×</button>
-    <span class="eyebrow" id="dialogCategory">EXHIBIT</span>
-    <span class="dialog-number" id="dialogNumber">NO. 001</span>
-    <p class="dialog-message" id="dialogMessage"></p>
-    <div class="dialog-footer">
-      <span>LEFT HERE BY SOMEONE, SOMEWHERE.</span>
-      <button id="understoodBtn">I understand ♡</button>
-    </div>
-  </dialog>
+.button-primary:hover {
+  background: #d8b5c5;
+}
 
-</body>
-</html>
+.button span {
+  font-size: 16px;
+}
+
+.text-link {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.text-link:hover {
+  color: var(--text);
+}
+
+.hero-bottom {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.hero-quote {
+  font: italic 13px var(--serif);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hero-orbit {
+  position: absolute;
+  border: 1px solid rgba(194, 154, 170, 0.09);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orbit-one {
+  width: 540px;
+  height: 540px;
+  right: -190px;
+  top: 60px;
+}
+
+.orbit-two {
+  width: 370px;
+  height: 370px;
+  right: -105px;
+  top: 145px;
+}
+
+.intro-strip {
+  min-height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(15px, 4vw, 55px);
+  flex-wrap: wrap;
+  padding: 20px;
+  background: #191519;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1.7px;
+}
+
+.strip-star {
+  color: var(--accent);
+  font-size: 16px;
+}
+
+.section-padding {
+  padding: 120px 10%;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+}
+
+.section-heading h2,
+.leave-copy h2 {
+  font: 400 clamp(35px, 5vw, 57px)/1.25 var(--serif);
+  letter-spacing: -1.7px;
+  margin-top: 17px;
+}
+
+.section-description {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 16px;
+}
+
+.random-button {
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 12px 17px;
+  cursor: pointer;
+  font-size: 11px;
+  white-space: nowrap;
+  transition: border-color 0.25s;
+}
+
+.random-button:hover {
+  border-color: var(--accent);
+}
+
+.random-button span {
+  color: var(--accent);
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 45px;
+}
+
+.filter {
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 10px 15px;
+  color: var(--muted);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.filter:hover,
+.filter.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1b1219;
+}
+
+.collection-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 35px 0 16px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.exhibit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.exhibit-card {
+  min-height: 250px;
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.35s, border-color 0.35s, background 0.35s;
+  animation: rise 0.6s both;
+}
+
+.exhibit-card::after {
+  content: "";
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  right: -80px;
+  bottom: -80px;
+  border: 1px solid rgba(194, 154, 170, 0.18);
+  border-radius: 50%;
+  transition: transform 0.5s;
+}
+
+.exhibit-card:hover {
+  transform: translateY(-5px);
+  border-color: #705263;
+  background: #20191f;
+}
+
+.exhibit-card:hover::after {
+  transform: scale(2);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-category {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.card-number {
+  color: #746774;
+  font: 12px var(--serif);
+}
+
+.card-message {
+  font: 400 19px/1.65 var(--serif);
+  margin: 26px 0;
+  overflow-wrap: anywhere;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.card-open {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.collection-footnote {
+  margin-top: 30px;
+  text-align: center;
+  color: var(--muted);
+  font: italic 13px var(--serif);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 15px;
+  color: var(--muted);
+}
+
+.empty-state p {
+  color: var(--text);
+  font: 25px var(--serif);
+  margin-bottom: 8px;
+}
+
+.interlude {
+  min-height: 330px;
+  padding: 70px 20px;
+  background: #1a151a;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.interlude-mark {
+  color: var(--accent);
+  font-size: 26px;
+}
+
+.interlude p {
+  max-width: 650px;
+  margin: 25px 0;
+  font: italic 32px/1.6 var(--serif);
+}
+
+.interlude-caption {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+.leave-section {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.leave-copy > p {
+  max-width: 420px;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 22px;
+  line-height: 2;
+}
+
+.privacy-note {
+  display: flex;
+  gap: 15px;
+  padding-top: 25px;
+  margin-top: 35px;
+  border-top: 1px solid var(--line);
+}
+
+.privacy-icon {
+  color: var(--accent);
+  font-size: 19px;
+}
+
+.privacy-note strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.privacy-note p {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 7px;
+  line-height: 1.8;
+}
+
+.message-form {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: clamp(22px, 4vw, 36px);
+}
+
+.form-top {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 22px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+
+.message-form label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin: 23px 0 10px;
+}
+
+.message-form select,
+.message-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  padding: 13px;
+  outline: none;
+  border-radius: 0;
+  transition: border-color 0.25s;
+}
+
+.message-form select {
+  min-height: 46px;
+}
+
+.message-form textarea {
+  min-height: 160px;
+  resize: vertical;
+  font: italic 17px/1.8 var(--serif);
+}
+
+.message-form textarea::placeholder {
+  color: #716572;
+}
+
+.message-form select:focus,
+.message-form textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 10px;
+}
+
+.submit-button {
+  width: 100%;
+  margin-top: 25px;
+}
+
+.form-status {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.closing {
+  padding: 90px 20px 100px;
+  text-align: center;
+  border-top: 1px solid var(--line);
+  background: #141115;
+}
+
+.closing-symbol {
+  font: 32px var(--serif);
+  color: var(--accent);
+}
+
+.closing h2 {
+  font: 400 clamp(38px, 6vw, 65px)/1.3 var(--serif);
+  margin-top: 24px;
+}
+
+.closing h2 em {
+  color: var(--accent);
+}
+
+.closing > p {
+  color: var(--muted);
+  font: italic 15px var(--serif);
+  margin-top: 20px;
+}
+
+.back-top {
+  display: inline-block;
+  margin-top: 35px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+}
+
+.footer {
+  min-height: 75px;
+  padding: 22px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.exhibit-dialog {
+  width: min(560px, calc(100% - 32px));
+  max-height: 85vh;
+  overflow-y: auto;
+  margin: auto;
+  padding: clamp(25px, 6vw, 48px);
+  background: #1b161c;
+  color: var(--text);
+  border: 1px solid #594252;
+}
+
+.exhibit-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+.dialog-close {
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  border: 0;
+  background: none;
+  font-size: 30px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.dialog-number {
+  display: block;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.dialog-message {
+  font: 400 clamp(23px, 5vw, 36px)/1.7 var(--serif);
+  overflow-wrap: anywhere;
+  margin: 25px 0 35px;
+}
+
+.dialog-footer {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dialog-footer span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.dialog-footer button {
+  background: none;
+  border: 1px solid var(--line);
+  padding: 9px 13px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.dialog-footer button:hover {
+  border-color: var(--accent);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .section-padding {
+    padding: 90px 6%;
+  }
+
+  .exhibit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .leave-section {
+    gap: 40px;
+  }
+
+  .header-note {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    height: 68px;
+    padding: 0 5%;
+  }
+
+  .logo {
+    gap: 8px;
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .logo-icon {
+    font-size: 25px;
+  }
+
+  .navbar nav {
+    gap: 12px;
+  }
+
+  .navbar nav a {
+    font-size: 9px;
+  }
+
+  .hero {
+    height: auto;
+    min-height: 660px;
+    padding: 27px 6% 22px;
+  }
+
+  .hero-number {
+    display: none;
+  }
+
+  .hero-content {
+    margin: 55px auto;
+  }
+
+  .hero h1 {
+    font-size: clamp(47px, 12vw, 70px);
+    letter-spacing: -2px;
+  }
+
+  .hero-pretitle {
+    font-size: 14px;
+  }
+
+  .hero-bottom {
+    flex-wrap: wrap;
+    font-size: 8px;
+  }
+
+  .hero-quote {
+    display: none;
+  }
+
+  .orbit-one {
+    right: -330px;
+  }
+
+  .orbit-two {
+    right: -240px;
+  }
+
+  .intro-strip {
+    gap: 12px;
+    font-size: 8px;
+  }
+
+  .section-padding {
+    padding: 75px 6%;
+  }
+
+  .section-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .section-heading h2,
+  .leave-copy h2 {
+    font-size: 40px;
+  }
+
+  .filter-list {
+    margin-top: 30px;
+  }
+
+  .filter {
+    padding: 9px 11px;
+    font-size: 9px;
+  }
+
+  .collection-meta {
+    flex-direction: column;
+    font-size: 8px;
+  }
+
+  .exhibit-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .exhibit-card {
+    min-height: 220px;
+  }
+
+  .card-message {
+    font-size: 21px;
+  }
+
+  .interlude {
+    min-height: 280px;
+  }
+
+  .interlude p {
+    font-size: 26px;
+  }
+
+  .leave-section {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .footer {
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
