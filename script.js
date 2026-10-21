@@ -70,6 +70,9 @@ const newExhibitNumber = document.getElementById("newExhibitNumber");
 let activeCategory = "All";
 let currentExhibits = [];
 let lastOpenedCard = null;
+let selectionMode = false;
+
+const selectedExhibits = new Set();
 
 function loadSubmissions() {
   try {
@@ -109,6 +112,171 @@ function getNumber(index) {
   return String(index + 1).padStart(3, "0");
 }
 
+/* BULK SELECTION TOOLBAR */
+
+const toolbar = document.createElement("div");
+toolbar.className = "selection-toolbar";
+
+toolbar.innerHTML = `
+  <button type="button" class="select-mode-btn">
+    Select
+  </button>
+
+  <div class="selection-actions" hidden>
+    <label class="select-all-label">
+      <input type="checkbox" class="select-all-checkbox">
+      <span>Select All</span>
+    </label>
+
+    <span class="selection-count" aria-live="polite">
+      0 selected
+    </span>
+
+    <button type="button" class="delete-selected-btn" disabled>
+      Delete Selected
+    </button>
+
+    <button type="button" class="cancel-selection-btn">
+      Cancel
+    </button>
+  </div>
+`;
+
+grid.parentNode.insertBefore(toolbar, grid);
+
+const selectModeBtn = toolbar.querySelector(".select-mode-btn");
+const selectionActions = toolbar.querySelector(".selection-actions");
+const selectAllCheckbox = toolbar.querySelector(".select-all-checkbox");
+const selectionCount = toolbar.querySelector(".selection-count");
+const deleteSelectedBtn = toolbar.querySelector(".delete-selected-btn");
+const cancelSelectionBtn = toolbar.querySelector(".cancel-selection-btn");
+
+function getVisibleSubmissions() {
+  return currentExhibits.filter(exhibit =>
+    Boolean(exhibit.createdAt)
+  );
+}
+
+function updateSelectionToolbar() {
+  const allSaved = loadSubmissions();
+
+  const savedIds = new Set(
+    allSaved.map(item => item.createdAt).filter(Boolean)
+  );
+
+  // Remove selections for confessions that no longer exist.
+  for (const id of selectedExhibits) {
+    if (!savedIds.has(id)) {
+      selectedExhibits.delete(id);
+    }
+  }
+
+  const visible = getVisibleSubmissions();
+
+  const selectedVisible = visible.filter(exhibit =>
+    selectedExhibits.has(exhibit.createdAt)
+  );
+
+  selectionCount.textContent =
+    `${selectedExhibits.size} selected`;
+
+  selectAllCheckbox.checked =
+    visible.length > 0 &&
+    selectedVisible.length === visible.length;
+
+  selectAllCheckbox.indeterminate =
+    selectedVisible.length > 0 &&
+    selectedVisible.length < visible.length;
+
+  selectAllCheckbox.disabled = visible.length === 0;
+
+  deleteSelectedBtn.disabled =
+    selectedExhibits.size === 0;
+
+  deleteSelectedBtn.textContent =
+    selectedExhibits.size > 0
+      ? `Delete Selected (${selectedExhibits.size})`
+      : "Delete Selected";
+}
+
+selectModeBtn.addEventListener("click", () => {
+  selectionMode = true;
+  selectModeBtn.hidden = true;
+  selectionActions.hidden = false;
+  renderExhibits();
+});
+
+cancelSelectionBtn.addEventListener("click", () => {
+  selectionMode = false;
+  selectedExhibits.clear();
+
+  selectModeBtn.hidden = false;
+  selectionActions.hidden = true;
+
+  selectAllCheckbox.checked = false;
+  selectAllCheckbox.indeterminate = false;
+
+  renderExhibits();
+});
+
+selectAllCheckbox.addEventListener("change", () => {
+  const visible = getVisibleSubmissions();
+
+  visible.forEach(exhibit => {
+    if (selectAllCheckbox.checked) {
+      selectedExhibits.add(exhibit.createdAt);
+    } else {
+      selectedExhibits.delete(exhibit.createdAt);
+    }
+  });
+
+  renderExhibits();
+});
+
+deleteSelectedBtn.addEventListener("click", () => {
+  const idsToDelete = new Set(selectedExhibits);
+
+  if (idsToDelete.size === 0) return;
+
+  const confirmed = window.confirm(
+    `Are you sure you want to delete ${idsToDelete.size} selected confession(s)? This cannot be undone.`
+  );
+
+  if (!confirmed) return;
+
+  const saved = loadSubmissions();
+
+  const remaining = saved.filter(exhibit =>
+    !idsToDelete.has(exhibit.createdAt)
+  );
+
+  const deletedCount = saved.length - remaining.length;
+
+  if (deletedCount === 0) {
+    selectedExhibits.clear();
+    renderExhibits();
+    return;
+  }
+
+  if (!saveSubmissions(remaining)) {
+    alert("Unable to delete confessions. Please try again.");
+    return;
+  }
+
+  selectedExhibits.clear();
+  selectionMode = false;
+
+  selectModeBtn.hidden = false;
+  selectionActions.hidden = true;
+
+  renderExhibits();
+
+  formStatus.textContent =
+    `${deletedCount} confession(s) deleted successfully.`;
+});
+
+/* RENDER EXHIBITS */
+
 function renderExhibits() {
   const allExhibits = getAllExhibits();
 
@@ -126,14 +294,18 @@ function renderExhibits() {
 
   currentExhibits.forEach((exhibit, index) => {
     const card = document.createElement("article");
+
     card.className = "exhibit-card";
     card.tabIndex = 0;
     card.setAttribute("role", "button");
+
     card.setAttribute(
       "aria-label",
       `Open exhibit ${getNumber(exhibit.number - 1)}`
     );
-    card.style.animationDelay = `${Math.min(index * 45, 350)}ms`;
+
+    card.style.animationDelay =
+      `${Math.min(index * 45, 350)}ms`;
 
     const top = document.createElement("div");
     top.className = "card-top";
@@ -144,7 +316,8 @@ function renderExhibits() {
 
     const number = document.createElement("span");
     number.className = "card-number";
-    number.textContent = `NO. ${getNumber(exhibit.number - 1)}`;
+    number.textContent =
+      `NO. ${getNumber(exhibit.number - 1)}`;
 
     top.append(category, number);
 
@@ -166,66 +339,126 @@ function renderExhibits() {
     arrow.textContent = "↗";
     arrow.setAttribute("aria-hidden", "true");
 
-    actions.appendChild(arrow);
+    /*
+      Only submitted confessions have createdAt.
+      The 12 original exhibits remain protected.
+    */
 
-    // Show Delete only for messages submitted by the visitor.
     if (exhibit.createdAt) {
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "delete-exhibit";
-      deleteBtn.textContent = "Delete";
-      deleteBtn.type = "button";
-      deleteBtn.setAttribute(
-        "aria-label",
-        "Delete this exhibit"
-      );
+      if (selectionMode) {
+        const label = document.createElement("label");
+        label.className = "exhibit-select-label";
 
-      deleteBtn.addEventListener("click", event => {
-        event.stopPropagation();
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "exhibit-select-checkbox";
 
-        if (!confirm("Delete this exhibit from your browser?")) {
-          return;
-        }
+        checkbox.checked =
+          selectedExhibits.has(exhibit.createdAt);
 
-        const saved = loadSubmissions();
-
-        const submissionIndex = saved.findIndex(item =>
-          item.createdAt === exhibit.createdAt &&
-          item.message === exhibit.message &&
-          item.category === exhibit.category
+        checkbox.setAttribute(
+          "aria-label",
+          `Select confession ${getNumber(exhibit.number - 1)}`
         );
 
-        if (submissionIndex === -1) {
-          return;
-        }
+        checkbox.addEventListener("click", event => {
+          event.stopPropagation();
+        });
 
-        saved.splice(submissionIndex, 1);
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            selectedExhibits.add(exhibit.createdAt);
+          } else {
+            selectedExhibits.delete(exhibit.createdAt);
+          }
 
-        if (saveSubmissions(saved)) {
-          renderExhibits();
-          formStatus.textContent = "Your exhibit has been deleted.";
-        } else {
-          alert("Unable to delete this exhibit.");
-        }
-      });
+          card.classList.toggle(
+            "is-selected",
+            checkbox.checked
+          );
 
-      actions.appendChild(deleteBtn);
+          updateSelectionToolbar();
+        });
+
+        label.appendChild(checkbox);
+        card.appendChild(label);
+
+        card.classList.toggle(
+          "is-selected",
+          checkbox.checked
+        );
+      } else {
+        const deleteBtn = document.createElement("button");
+
+        deleteBtn.type = "button";
+        deleteBtn.className = "delete-exhibit";
+        deleteBtn.textContent = "Delete";
+
+        deleteBtn.setAttribute(
+          "aria-label",
+          "Delete this confession"
+        );
+
+        deleteBtn.addEventListener("click", event => {
+          event.stopPropagation();
+
+          const confirmed = window.confirm(
+            "Delete this confession from this browser?"
+          );
+
+          if (!confirmed) return;
+
+          const saved = loadSubmissions();
+
+          const remaining = saved.filter(item =>
+            !(
+              item.createdAt === exhibit.createdAt &&
+              item.message === exhibit.message &&
+              item.category === exhibit.category
+            )
+          );
+
+          if (saveSubmissions(remaining)) {
+            selectedExhibits.delete(exhibit.createdAt);
+            renderExhibits();
+
+            formStatus.textContent =
+              "Your confession has been deleted.";
+          } else {
+            alert("Unable to delete this confession.");
+          }
+        });
+
+        actions.appendChild(deleteBtn);
+      }
     }
 
+    actions.appendChild(arrow);
     bottom.append(note, actions);
 
-    // Important: use "message", not "msg".
+    // Correct variable name: message.
     card.append(top, message, bottom);
 
     function openCard() {
+      if (selectionMode && exhibit.createdAt) {
+        const checkbox =
+          card.querySelector(".exhibit-select-checkbox");
+
+        if (checkbox) checkbox.click();
+        return;
+      }
+
       openExhibit(exhibit, card);
     }
 
     card.addEventListener("click", openCard);
 
     card.addEventListener("keydown", event => {
+      if (event.target !== card) return;
+
       if (
-        (event.key === "Enter" || event.key === " ") &&
-        event.target === card
+        event.key === "Enter" ||
+        event.key === " "
       ) {
         event.preventDefault();
         openCard();
@@ -240,18 +473,25 @@ function renderExhibits() {
   collectionCount.textContent =
     `${currentExhibits.length} OBJECTS IN THE COLLECTION`;
 
-  newExhibitNumber.textContent = getNumber(allExhibits.length);
+  newExhibitNumber.textContent =
+    getNumber(allExhibits.length);
+
+  updateSelectionToolbar();
 }
+
+/* EXHIBIT DIALOG */
 
 function openExhibit(exhibit, card) {
   lastOpenedCard = card || null;
 
-  dialogCategory.textContent = exhibit.category.toUpperCase();
+  dialogCategory.textContent =
+    exhibit.category.toUpperCase();
 
   dialogNumber.textContent =
     `NO. ${getNumber(exhibit.number - 1)}`;
 
-  dialogMessage.textContent = `“${exhibit.message}”`;
+  dialogMessage.textContent =
+    `“${exhibit.message}”`;
 
   if (!dialog.open) {
     dialog.showModal();
@@ -279,6 +519,8 @@ dialog.addEventListener("click", event => {
   }
 });
 
+/* CATEGORY FILTERS */
+
 filters.addEventListener("click", event => {
   const button = event.target.closest("[data-category]");
 
@@ -290,30 +532,39 @@ filters.addEventListener("click", event => {
     const isActive = filter === button;
 
     filter.classList.toggle("active", isActive);
-    filter.setAttribute("aria-pressed", String(isActive));
+
+    filter.setAttribute(
+      "aria-pressed",
+      String(isActive)
+    );
   });
 
   renderExhibits();
 });
 
+/* RANDOM EXHIBIT */
+
 randomBtn.addEventListener("click", () => {
-  if (currentExhibits.length === 0) {
-    return;
-  }
+  if (currentExhibits.length === 0) return;
 
   const randomIndex = Math.floor(
     Math.random() * currentExhibits.length
   );
 
-  const exhibit = currentExhibits[randomIndex];
-  const card = grid.children[randomIndex];
-
-  openExhibit(exhibit, card);
+  openExhibit(
+    currentExhibits[randomIndex],
+    grid.children[randomIndex]
+  );
 });
+
+/* CHARACTER COUNTER */
 
 messageInput.addEventListener("input", () => {
-  charCount.textContent = `${messageInput.value.length} / 500`;
+  charCount.textContent =
+    `${messageInput.value.length} / 500`;
 });
+
+/* SUBMIT A CONFESSION */
 
 form.addEventListener("submit", event => {
   event.preventDefault();
@@ -338,7 +589,8 @@ form.addEventListener("submit", event => {
   const newMessage = {
     category,
     message,
-    createdAt: new Date().toISOString()
+    createdAt:
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`
   };
 
   savedMessages.push(newMessage);
@@ -350,18 +602,24 @@ form.addEventListener("submit", event => {
   }
 
   activeCategory = "All";
+  selectedExhibits.clear();
 
   filters.querySelectorAll(".filter").forEach(button => {
     const isActive = button.dataset.category === "All";
 
     button.classList.toggle("active", isActive);
-    button.setAttribute("aria-pressed", String(isActive));
+
+    button.setAttribute(
+      "aria-pressed",
+      String(isActive)
+    );
   });
 
   renderExhibits();
 
   form.reset();
   charCount.textContent = "0 / 500";
+
   formStatus.textContent =
     "Your exhibit has been added to this browser's collection.";
 
@@ -370,5 +628,7 @@ form.addEventListener("submit", event => {
     block: "start"
   });
 });
+
+/* INITIALIZE */
 
 renderExhibits();
