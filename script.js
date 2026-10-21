@@ -54,14 +54,12 @@ const filters = document.getElementById("filters");
 const randomBtn = document.getElementById("randomBtn");
 const emptyState = document.getElementById("emptyState");
 const collectionCount = document.getElementById("collectionCount");
-
 const dialog = document.getElementById("exhibitDialog");
 const dialogClose = document.getElementById("dialogClose");
 const dialogCategory = document.getElementById("dialogCategory");
 const dialogNumber = document.getElementById("dialogNumber");
 const dialogMessage = document.getElementById("dialogMessage");
 const understoodBtn = document.getElementById("understoodBtn");
-
 const form = document.getElementById("messageForm");
 const categoryInput = document.getElementById("messageCategory");
 const messageInput = document.getElementById("messageText");
@@ -155,60 +153,68 @@ function renderExhibits() {
     message.textContent = `“${exhibit.message}”`;
 
     const bottom = document.createElement("div");
-bottom.className = "card-bottom";
+    bottom.className = "card-bottom";
 
-const note = document.createElement("span");
-note.textContent = "LEFT HERE BY SOMEONE, SOMEWHERE";
+    const note = document.createElement("span");
+    note.textContent = "LEFT HERE BY SOMEONE, SOMEWHERE";
 
-const actions = document.createElement("div");
-actions.className = "card-actions";
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
 
-const arrow = document.createElement("span");
-arrow.className = "card-open";
-arrow.textContent = "↗";
-arrow.setAttribute("aria-hidden", "true");
+    const arrow = document.createElement("span");
+    arrow.className = "card-open";
+    arrow.textContent = "↗";
+    arrow.setAttribute("aria-hidden", "true");
 
-actions.appendChild(arrow);
+    actions.appendChild(arrow);
 
-if (exhibit.createdAt) {
-  const deleteBtn = document.createElement("button");
-  deleteBtn.className = "delete-exhibit";
-  deleteBtn.textContent = "Delete";
-  deleteBtn.type = "button";
-  deleteBtn.setAttribute("aria-label", "Delete this exhibit");
-
-  deleteBtn.addEventListener("click", event => {
-    event.stopPropagation();
-
-    if (!confirm("Delete this exhibit from your browser?")) return;
-
-    const saved = loadSubmissions();
-    const index = saved.findIndex(item =>
-      item.createdAt === exhibit.createdAt &&
-      item.message === exhibit.message &&
-      item.category === exhibit.category
-    );
-
-    if (index === -1) return;
-
-    saved.splice(index, 1);
-
-    try {
-      localStorage.setItem(
-        "unsentMuseumMessages",
-        JSON.stringify(saved)
+    // Show Delete only for messages submitted by the visitor.
+    if (exhibit.createdAt) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-exhibit";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.type = "button";
+      deleteBtn.setAttribute(
+        "aria-label",
+        "Delete this exhibit"
       );
-      renderExhibits();
-    } catch {
-      alert("Unable to delete this exhibit.");
+
+      deleteBtn.addEventListener("click", event => {
+        event.stopPropagation();
+
+        if (!confirm("Delete this exhibit from your browser?")) {
+          return;
+        }
+
+        const saved = loadSubmissions();
+
+        const submissionIndex = saved.findIndex(item =>
+          item.createdAt === exhibit.createdAt &&
+          item.message === exhibit.message &&
+          item.category === exhibit.category
+        );
+
+        if (submissionIndex === -1) {
+          return;
+        }
+
+        saved.splice(submissionIndex, 1);
+
+        if (saveSubmissions(saved)) {
+          renderExhibits();
+          formStatus.textContent = "Your exhibit has been deleted.";
+        } else {
+          alert("Unable to delete this exhibit.");
+        }
+      });
+
+      actions.appendChild(deleteBtn);
     }
-  });
 
-  actions.appendChild(deleteBtn);
-}
+    bottom.append(note, actions);
 
-bottom.append(note, actions);
-card.append(top, msg, bottom);
+    // Important: use "message", not "msg".
+    card.append(top, message, bottom);
 
     function openCard() {
       openExhibit(exhibit, card);
@@ -217,7 +223,10 @@ card.append(top, msg, bottom);
     card.addEventListener("click", openCard);
 
     card.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
+      if (
+        (event.key === "Enter" || event.key === " ") &&
+        event.target === card
+      ) {
         event.preventDefault();
         openCard();
       }
@@ -227,6 +236,7 @@ card.append(top, msg, bottom);
   });
 
   emptyState.hidden = currentExhibits.length !== 0;
+
   collectionCount.textContent =
     `${currentExhibits.length} OBJECTS IN THE COLLECTION`;
 
@@ -236,8 +246,7 @@ card.append(top, msg, bottom);
 function openExhibit(exhibit, card) {
   lastOpenedCard = card || null;
 
-  dialogCategory.textContent =
-    exhibit.category.toUpperCase();
+  dialogCategory.textContent = exhibit.category.toUpperCase();
 
   dialogNumber.textContent =
     `NO. ${getNumber(exhibit.number - 1)}`;
@@ -279,6 +288,7 @@ filters.addEventListener("click", event => {
 
   filters.querySelectorAll(".filter").forEach(filter => {
     const isActive = filter === button;
+
     filter.classList.toggle("active", isActive);
     filter.setAttribute("aria-pressed", String(isActive));
   });
@@ -343,6 +353,7 @@ form.addEventListener("submit", event => {
 
   filters.querySelectorAll(".filter").forEach(button => {
     const isActive = button.dataset.category === "All";
+
     button.classList.toggle("active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
