@@ -1,1 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#100e10">
+  <meta name="description" content="A quiet digital museum for the things we never said.">
+  <title>The Museum of Unsent Things</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <div class="grain"></div>
+
+  <header class="navbar">
+    <a href="#home" class="logo">
+      <span class="logo-icon">M.</span>
+      <span>THE UNSENT ARCHIVE</span>
+    </a>
+    <nav>
+      <a href="#museum">The collection</a>
+      <a href="#leave-message">Leave a message</a>
+    </nav>
+    <span class="header-note">EST. IN SILENCE</span>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-top">
+        <span class="eyebrow"><span class="live-dot"></span> A MUSEUM OF HUMAN FEELING</span>
+        <span class="hero-number">VOL. 001 — FOREVER UNFINISHED</span>
+      </div>
+
+      <div class="hero-content">
+        <p class="hero-pretitle">Some words never find their way home.</p>
+
+        <h1>The Museum<br>of <em>Unsent</em> Things<span class="period">.</span></h1>
+
+        <p class="hero-description">
+          Letters never delivered. Apologies never spoken.
+          People we still think about.
+          A quiet place for everything we couldn't say.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#museum" class="button button-primary">
+            Enter the museum <span>↗</span>
+          </a>
+          <a href="#leave-message" class="text-link">Leave something behind ↓</a>
+        </div>
+      </div>
+
+      <div class="hero-bottom">
+        <span>FOR THE WORDS WE KEPT</span>
+        <span class="hero-quote">"Somewhere between feeling and saying."</span>
+        <span>SCROLL TO EXPLORE ↓</span>
+      </div>
+
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+    </section>
+
+    <section class="intro-strip">
+      <span>NO NAMES REQUIRED.</span>
+      <span class="strip-star">✳</span>
+      <span>NO EXPLANATIONS NEEDED.</span>
+      <span class="strip-star">✳</span>
+      <span>JUST HUMAN THINGS.</span>
+    </section>
+
+    <section class="museum section-padding" id="museum">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">01 / THE COLLECTION</span>
+          <h2>Exhibits of the <em>unsaid.</em></h2>
+          <p class="section-description">
+            Every feeling leaves something behind.
+            Here are a few things someone couldn't say.
+          </p>
+        </div>
+
+        <button class="random-button" id="randomBtn">
+          <span>↻</span> Surprise me
+        </button>
+      </div>
+
+      <div class="filter-list" id="filters">
+        <button class="filter active" data-category="All">All exhibits</button>
+        <button class="filter" data-category="Almost Said">Almost said</button>
+        <button class="filter" data-category="Unspoken Love">Unspoken love</button>
+        <button class="filter" data-category="Goodbyes">Goodbyes</button>
+        <button class="filter" data-category="Apologies">Apologies</button>
+        <button class="filter" data-category="What If">What if</button>
+      </div>
+
+      <div class="collection-meta">
+        <span id="collectionCount">12 OBJECTS IN THE COLLECTION</span>
+        <span>TAKE YOUR TIME. THERE IS NO RUSH.</span>
+      </div>
+
+      <div class="exhibit-grid" id="exhibitGrid"></div>
+
+      <div class="empty-state" id="emptyState" hidden>
+        <p>Nothing here yet.</p>
+        <span>Maybe you'll be the first to leave something behind.</span>
+      </div>
+
+      <p class="collection-footnote">
+        All stories are presented without names. Take what resonates.
+        Leave what doesn't.
+      </p>
+    </section>
+
+    <section class="interlude">
+      <span class="interlude-mark">✳</span>
+      <p>Perhaps the hardest things to say are the ones that mattered the most.</p>
+      <span class="interlude-caption">A THOUGHT LEFT IN THE HALLWAY</span>
+    </section>
+
+    <section class="leave-section section-padding" id="leave-message">
+      <div class="leave-copy">
+        <span class="eyebrow">02 / YOUR EXHIBIT</span>
+        <h2>Leave the words.<br><em>Keep your name.</em></h2>
+        <p>
+          You don't have to send it. You don't have to explain it.
+          Write the thing that has been sitting inside you for too long.
+          Let it exist somewhere other than your mind.
+        </p>
+
+        <div class="privacy-note">
+          <span class="privacy-icon">✳</span>
+          <div>
+            <strong>A little room for privacy</strong>
+            <p>This demo saves your submission only in this browser.
+              It is not published to a shared public collection.</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="message-form" id="messageForm">
+        <div class="form-top">
+          <span>NEW EXHIBIT</span>
+          <span>NO. <span id="newExhibitNumber">013</span></span>
+        </div>
+
+        <label for="messageCategory">WHAT KIND OF UNSAID THING IS IT?</label>
+        <select id="messageCategory" required>
+          <option value="Almost Said">Something I almost said</option>
+          <option value="Unspoken Love">Someone I loved</option>
+          <option value="Goodbyes">A goodbye</option>
+          <option value="Apologies">An apology</option>
+          <option value="What If">A what if</option>
+        </select>
+
+        <label for="messageText">YOUR WORDS</label>
+        <textarea
+          id="messageText"
+          maxlength="500"
+          minlength="5"
+          placeholder="Dear someone, somewhere..."
+          required
+        ></textarea>
+
+        <div class="form-meta">
+          <span>WRITE WITHOUT FEAR.</span>
+          <span id="charCount">0 / 500</span>
+        </div>
+
+        <button class="button button-primary submit-button" type="submit">
+          Leave it here <span>↗</span>
+        </button>
+
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="closing">
+      <span class="closing-symbol">M.</span>
+      <h2>Not everything needs<br>to be <em>sent.</em></h2>
+      <p>Some things just need somewhere to exist.</p>
+      <a href="#home" class="back-top">RETURN TO THE BEGINNING ↑</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="#home">THE UNSENT ARCHIVE © 2026</a>
+    <span>MADE FOR THE THINGS WE NEVER SAID.</span>
+    <a href="#museum">BACK TO THE COLLECTION ↑</a>
+  </footer>
+
+  <dialog class="exhibit-dialog" id="exhibitDialog">
+    <button class="dialog-close" id="dialogClose" aria-label="Close">×</button>
+    <span class="eyebrow" id="dialogCategory">EXHIBIT</span>
+    <span class="dialog-number" id="dialogNumber">NO. 001</span>
+    <p class="dialog-message" id="dialogMessage"></p>
+    <div class="dialog-footer">
+      <span>LEFT HERE BY SOMEONE, SOMEWHERE.</span>
+      <button id="understoodBtn">I understand ♡</button>
+    </div>
+  </dialog>
+
+</body>
+</html>
